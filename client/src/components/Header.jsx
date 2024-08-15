@@ -22,7 +22,7 @@ function Header() {
           <input
             type="text"
             placeholder="Search..."
-            className="w-24 sm:w-64 bg-transparent outline-none border-b border-transparent focus:border-slate-500"
+            className="w-28 sm:w-64 bg-transparent outline-none border-b border-transparent focus:border-slate-500"
           />
           <FaSearch className="text-slate-500" />
         </form>
