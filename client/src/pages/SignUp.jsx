@@ -1,38 +1,85 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link,useNavigate } from "react-router-dom";
+import { FaSpinner } from "react-icons/fa";
+import { notify } from "../utils/Notify";
+import "react-toastify/dist/ReactToastify.css";
 
 const inputCss =
   "border border-transparent border-b-slate-500 p-2 bg-transparent outline-none shadow-md focus:shadow-sm";
 
 const buttonCss =
-  "p-2 rounded-lg cursor-pointer text-white uppercase shadow-md active:shadow-sm hover:opacity-95 disabled:opacity-70 disabled:pointer-events-none disabled:shadow-sm";
+  "p-2 flex justify-center rounded-lg cursor-pointer text-white uppercase shadow-md active:shadow-sm hover:opacity-95 disabled:opacity-70 disabled:pointer-events-none disabled:shadow-sm";
 
 function SignUp() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {});
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        notify(data.message, "error");
+      } else {
+        notify("User signup successfull.", "success");
+        setLoading(false);
+        navigate('/sign-in')
+      }
+    } catch (err) {
+      console.log("error1: ", err);
+    }
+    setLoading(false);
+  };
+  const handleNotify = () => {};
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-center text-xl sm:text-3xl font-semibold my-7">
         Sign Up
       </h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           className={inputCss}
           placeholder="Username"
           type="text"
           id="username"
+          onChange={handleChange}
+          required
         ></input>
         <input
           className={inputCss}
           placeholder="Email"
           type="email"
           id="email"
+          onChange={handleChange}
+          required
         ></input>
         <input
           className={inputCss}
           placeholder="Password"
           type="password"
           id="password"
+          onChange={handleChange}
+          required
         ></input>
-        <button className={`bg-slate-700 ${buttonCss}`}>sign up</button>
+        <button className={`bg-slate-700 ${buttonCss}`} disabled={loading}>
+          {loading ? <FaSpinner size={20} /> : <span>sign up</span>}
+        </button>
         <button disabled className={`bg-red-700 ${buttonCss}`}>
           continue with google
         </button>
