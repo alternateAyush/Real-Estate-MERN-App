@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner, FaRegEye, FaRegEyeSlash} from "react-icons/fa";
 import { notify } from "../utils/Notify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,6 +15,7 @@ function SignUp() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [guideline, setGuideline] = useState(null);
+  const [hidden,setHidden] = useState(true);
   useEffect(() => {});
   const handleChange = (e) => {
     setGuideline(null);
@@ -87,14 +88,19 @@ function SignUp() {
           onChange={handleChange}
           required
         ></input>
-        <input
-          className={inputCss}
-          placeholder='Password'
-          type='password'
-          id='password'
-          onChange={handleChange}
-          required
-        ></input>
+         <div className='flex flex-row items-center relative'>
+          <input
+            className={`${inputCss} w-full`}
+            placeholder='Password'
+            type={hidden? 'password':'text'}
+            id='password'
+            onChange={handleChange}
+            required
+          />
+          <button className='absolute right-1 cursor-pointer' type='button' onClick={()=>{setHidden(!hidden)}}>
+            {hidden? <FaRegEye />:<FaRegEyeSlash/>}
+          </button>
+        </div>
         <button className={`bg-slate-700 ${buttonCss}`} disabled={loading}>
           {loading ? <FaSpinner size={20} /> : <span>sign up</span>}
         </button>
@@ -105,7 +111,7 @@ function SignUp() {
       <div className='flex gap-1 mt-3'>
         <p>Have an account?</p>
         <Link to='/sign-in'>
-          <span className='text-blue-700'>Click Here.</span>
+          <span className='text-blue-700 hover:underline'>Log in</span>
         </Link>
       </div>
       {guideline && <p className='text-red-500'>{guideline}</p>}
