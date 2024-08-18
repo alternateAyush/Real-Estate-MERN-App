@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaSpinner, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { notify } from "../utils/Notify";
 import "react-toastify/dist/ReactToastify.css";
+import {useDispatch,useSelector} from 'react-redux';
+import { signInStart,signInSuccess,signInFailure } from "../redux/user/userSlice.js";
 
 const inputCss =
   "border border-transparent border-b-slate-500 p-2 bg-transparent outline-none shadow-md focus:shadow-sm";
@@ -11,9 +13,10 @@ const buttonCss =
   "p-2 flex justify-center rounded-lg cursor-pointer text-white uppercase shadow-md active:shadow-sm hover:opacity-95 disabled:opacity-70 disabled:pointer-events-none disabled:shadow-sm";
 
 function SignIn() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
+  const {loading, error} = useSelector((state)=>state.user);
   const [hidden, setHidden] = useState(true);
   useEffect(() => {});
   const handleChange = (e) => {
@@ -24,7 +27,7 @@ function SignIn() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch(signInStart());
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -35,17 +38,19 @@ function SignIn() {
       });
       const data = await res.json();
       if (data.success === false) {
-        console.log(data.message);
+        console.log(data);
         notify(data.message, "error");
+        dispatch(signInFailure(data.message));
+        return;
       } else {
         notify(`Welcome ${data.username}!`, "success");
-        setLoading(false);
+        dispatch(signInSuccess(data));
         navigate("/");
+        return;
       }
     } catch (err) {
       console.log("error1: ", err);
     }
-    setLoading(false);
   };
   return (
     <div className='p-3 max-w-lg mx-auto'>
